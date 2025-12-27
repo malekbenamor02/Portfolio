@@ -24,7 +24,7 @@ export function Contact() {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   
   // Use Formspree's official React hook
-  const [formspreeState, submitToFormspree] = useFormspree("xeoggvpd");
+  const [formspreeState, submitToFormspree] = useFormspree("xgoeabjo");
 
   const {
     register,
