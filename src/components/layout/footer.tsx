@@ -81,7 +81,7 @@ export function Footer() {
             © {currentYear} {SITE_CONFIG.name}. All rights reserved.
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Built with 💜 using Next.js, TypeScript, and Tailwind CSS
+            Built with much coffee
           </p>
         </div>
       </div>

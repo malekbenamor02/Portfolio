@@ -29,9 +29,9 @@ export const generateMetadata = (): Metadata => {
     ],
     creator: SITE_CONFIG.name,
     icons: {
-      icon: '/favicon2.ico?v=2',
-      shortcut: '/favicon2.ico?v=2',
-      apple: '/favicon2.ico?v=2',
+      icon: '/images/favicon.png',
+      shortcut: '/images/favicon.png',
+      apple: '/images/favicon.png',
     },
     openGraph: {
       type: "website",

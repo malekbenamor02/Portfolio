@@ -4,7 +4,7 @@ export const SITE_CONFIG = {
   name: "Malek Ben Amor",
   description: "Junior Full Stack Developer | Building Real-World Web Platforms",
   url: "https://malekbenamor.dev",
-  ogImage: "/images/og-image.png",
+  ogImage: "/images/og_image.png",
   links: {
     email: "contact@malekbenamor.dev",
     github: "https://github.com/malekbenamor02",
