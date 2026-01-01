@@ -24,7 +24,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       // This creates a smooth crossfade effect
       const timer = setTimeout(() => {
         setShowContent(true);
-      }, 2500); // Start fade-in at 2.5s (intro starts fading at 2.5s, finishes at 3.2s)
+      }, 2500); // Start fade-in at 2.5s (intro starts fading at 2.5s, finishes at 3.2s) - Trigger deployment
       
       return () => clearTimeout(timer);
     }
