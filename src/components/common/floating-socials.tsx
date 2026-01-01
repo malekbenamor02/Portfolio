@@ -62,9 +62,9 @@ export function FloatingSocials() {
                 x: { duration: 0.3 }
               }}
               whileTap={{ scale: 0.95 }}
-              className="group relative flex items-center gap-3 rounded-full bg-background border shadow-lg hover:shadow-xl transition-all overflow-hidden"
+              className="group relative flex items-center gap-2 sm:gap-3 rounded-full bg-background border shadow-lg hover:shadow-xl transition-all overflow-hidden"
               style={{ 
-                width: isHovered ? "140px" : "48px",
+                width: isHovered ? "120px" : "48px",
                 transition: "width 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease"
               }}
               aria-label={social.label}
@@ -74,7 +74,7 @@ export function FloatingSocials() {
               </span>
               
               <span
-                className="whitespace-nowrap text-sm font-medium pr-3 text-foreground group-hover:text-primary transition-colors duration-300"
+                className="whitespace-nowrap text-xs sm:text-sm font-medium pr-2 sm:pr-3 text-foreground group-hover:text-primary transition-colors duration-300"
                 style={{
                   opacity: isHovered ? 1 : 0,
                   transition: "opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -93,7 +93,7 @@ export function FloatingSocials() {
         initial={{ opacity: 0, scaleY: 0 }}
         animate={{ opacity: 1, scaleY: 1 }}
         transition={{ delay: 1.5, duration: 0.5 }}
-        className="fixed left-[30px] hidden lg:block z-50 w-px h-20 bg-border"
+        className="fixed left-[30px] hidden sm:block z-50 w-px h-20 bg-border"
         style={{ 
           top: "calc(50% + 140px)",
           originY: 0 

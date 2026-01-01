@@ -37,24 +37,46 @@ export function Contact() {
 
   const onSubmit = async (data: ContactFormData) => {
     try {
-      // Submit directly using Formspree's hook - this bypasses spam filtering
-      await submitToFormspree(data);
-    } catch (error) {
-      console.error('Form submission error:', error);
+      // Submit directly using Formspree's hook
+      await submitToFormspree({
+        name: data.name,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+      });
+    } catch (error: any) {
+      // Silently handle fetch errors - they're often network/CORS related
+      if (error?.message?.includes('fetch') || error?.message?.includes('Failed')) {
+        // Formspree might have network issues, but form can still work
+        console.warn('Formspree network issue:', error);
+      } else {
+        console.error('Form submission error:', error);
+      }
       setSubmitStatus("error");
     }
   };
 
   // Update status based on Formspree state
   useEffect(() => {
-    if (formspreeState.succeeded) {
+    if (formspreeState?.succeeded) {
       setSubmitStatus("success");
       reset();
       setTimeout(() => setSubmitStatus("idle"), 5000);
-    } else if (formspreeState.errors && Object.keys(formspreeState.errors).length > 0) {
+    } else if (formspreeState?.errors && Object.keys(formspreeState.errors).length > 0) {
       setSubmitStatus("error");
     }
-  }, [formspreeState.succeeded, formspreeState.errors, reset]);
+  }, [formspreeState?.succeeded, formspreeState?.errors, reset]);
+  
+  // Handle Formspree errors silently
+  useEffect(() => {
+    if (formspreeState?.errors) {
+      const errorKeys = Object.keys(formspreeState.errors);
+      if (errorKeys.length > 0) {
+        // Log error but don't show it to user unless it's a submission error
+        console.warn("Formspree errors:", formspreeState.errors);
+      }
+    }
+  }, [formspreeState?.errors]);
   return (
     <section className="py-20 px-4">
       <div className="container mx-auto max-w-5xl">

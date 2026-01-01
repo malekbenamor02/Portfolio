@@ -8,6 +8,7 @@ import { LazyStarsBackground } from "@/components/3d/lazy-stars";
 export function SiteIntro() {
   const [isVisible, setIsVisible] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
     // Check if intro has been shown in this session
@@ -22,13 +23,19 @@ export function SiteIntro() {
         setShowContent(true);
       }, 300);
 
+      // Start exit animation slightly before hiding
+      const exitStartTimer = setTimeout(() => {
+        setIsExiting(true);
+      }, 2500); // Start fade out at 2.5s
+
       // Hide intro after animation sequence
       const hideTimer = setTimeout(() => {
         setIsVisible(false);
-      }, 3000); // Total duration: 3 seconds
+      }, 3200); // Total duration: 3.2 seconds
 
       return () => {
         clearTimeout(contentTimer);
+        clearTimeout(exitStartTimer);
         clearTimeout(hideTimer);
       };
     }
@@ -37,12 +44,13 @@ export function SiteIntro() {
   if (!isVisible) return null;
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isVisible && (
         <motion.div
           initial={{ opacity: 1 }}
+          animate={isExiting ? { opacity: 0 } : { opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+          transition={{ duration: 0.7, ease: "easeInOut" }}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-background overflow-hidden"
         >
           {/* Stars Background */}
@@ -62,17 +70,10 @@ export function SiteIntro() {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="mb-6"
             >
-              <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-tight">
-                <div className="block">
-                  <GradientText className="font-display">
-                    Malek
-                  </GradientText>
-                </div>
-                <div className="block mt-2 md:mt-3 lg:mt-4">
-                  <GradientText className="font-display">
-                    Ben Amor
-                  </GradientText>
-                </div>
+              <h1 className="font-display text-3xl md:text-4xl lg:text-8xl font-bold leading-tight">
+                <GradientText className="font-display">
+                  Malek Ben Amor
+                </GradientText>
               </h1>
             </motion.div>
 

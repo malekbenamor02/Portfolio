@@ -45,22 +45,15 @@ export function Hero() {
           <motion.h1
             variants={ANIMATION_VARIANTS.scaleIn}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight"
+            className="font-display text-3xl md:text-4xl lg:text-8xl font-bold mb-6 leading-tight"
             style={{ 
               background: "none",
               WebkitTextFillColor: "unset"
             }}
           >
-            <div className="block">
-              <GradientText className="font-display">
-                Malek
-              </GradientText>
-            </div>
-            <div className="block mt-2 md:mt-3 lg:mt-4">
-              <GradientText className="font-display">
-                Ben Amor
-              </GradientText>
-            </div>
+            <GradientText className="font-display">
+              Malek Ben Amor
+            </GradientText>
           </motion.h1>
 
           {/* Tagline */}
@@ -96,7 +89,7 @@ export function Hero() {
               </Button>
             </MagneticButton>
             <MagneticButton>
-              <Button asChild size="lg" variant="outline" className="text-sm sm:text-base px-4 sm:px-8">
+              <Button asChild size="lg" variant="outline" className="text-sm sm:text-base px-4 sm:px-8 hover:bg-accent hover:text-gray-900 hover:border-accent transition-colors">
                 <Link href="/contact">Contact Me</Link>
               </Button>
             </MagneticButton>
