@@ -8,8 +8,8 @@ export function NavigationEvents() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const url = `${pathname}?${searchParams}`;
-    // Removed console.log to reduce noise
+    // Navigation tracking - effect runs on route changes
+    // pathname and searchParams are dependencies
   }, [pathname, searchParams]);
 
   return null;

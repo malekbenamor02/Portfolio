@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { FloatingSocials } from "@/components/common/floating-socials";
 import { ScrollToTop } from "@/components/common/scroll-to-top";
 import { SiteIntro } from "@/components/common/site-intro";

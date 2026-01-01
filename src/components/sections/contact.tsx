@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm as useFormspree } from "@formspree/react";
 import { ANIMATION_VARIANTS, SITE_CONFIG } from "@/lib/constants";
-import { Mail, Phone, Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, Send, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Form validation schema
@@ -44,9 +44,10 @@ export function Contact() {
         subject: data.subject,
         message: data.message,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Silently handle fetch errors - they're often network/CORS related
-      if (error?.message?.includes('fetch') || error?.message?.includes('Failed')) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('fetch') || errorMessage.includes('Failed')) {
         // Formspree might have network issues, but form can still work
         console.warn('Formspree network issue:', error);
       } else {
