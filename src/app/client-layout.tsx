@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { FloatingSocials } from "@/components/common/floating-socials";
 import { ScrollToTop } from "@/components/common/scroll-to-top";
 import { SiteIntro } from "@/components/common/site-intro";
+import { VisitorCounter } from "@/components/common/visitor-counter";
 import { useRouteChange } from "@/hooks/use-route-change";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -40,6 +41,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         className="relative"
       >
         {children}
+        <VisitorCounter />
         <FloatingSocials />
         <ScrollToTop />
       </motion.div>
