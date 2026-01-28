@@ -26,7 +26,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { email, password } = loginSchema.parse(body);
 
-    const supabase = getSupabaseAdmin();
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch (supabaseError: unknown) {
+      const message = supabaseError instanceof Error ? supabaseError.message : 'Database configuration error';
+      console.error('Supabase initialization error:', message);
+      return NextResponse.json(
+        { error: 'Database not configured. Please check environment variables.' },
+        { status: 500 }
+      );
+    }
     
     // Get user from database
     const { data: user, error: userError } = await supabase
@@ -35,7 +45,23 @@ export async function POST(request: NextRequest) {
       .eq('email', email.toLowerCase())
       .single();
 
-    if (userError || !user) {
+    if (userError) {
+      // Check if it's a table doesn't exist error
+      if (userError.code === '42P01' || userError.message?.includes('does not exist')) {
+        console.error('Users table does not exist. Please run the database schema.');
+        return NextResponse.json(
+          { error: 'Database not set up. Please run the database schema first.' },
+          { status: 500 }
+        );
+      }
+      console.error('Database query error:', userError);
+      return NextResponse.json(
+        { error: 'Invalid email or password' },
+        { status: 401 }
+      );
+    }
+
+    if (!user) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }

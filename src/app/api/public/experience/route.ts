@@ -3,7 +3,14 @@ import { getSupabaseAdmin } from '@/lib/db/supabase-admin';
 
 export async function GET() {
   try {
-    const supabase = getSupabaseAdmin();
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch {
+      // If Supabase isn't configured, return empty array
+      console.warn('Supabase not configured, returning empty experience');
+      return NextResponse.json({ experience: [] });
+    }
     
     const { data: experience, error } = await supabase
       .from('experience')
@@ -11,11 +18,13 @@ export async function GET() {
       .order('order_index', { ascending: true });
 
     if (error) {
+      // If table doesn't exist, return empty array
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        console.warn('Experience table does not exist yet');
+        return NextResponse.json({ experience: [] });
+      }
       console.error('Error fetching experience:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch experience' },
-        { status: 500 }
-      );
+      return NextResponse.json({ experience: [] }); // Return empty instead of error
     }
 
     const mappedExperience = (experience || []).map((e) => {

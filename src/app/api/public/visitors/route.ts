@@ -3,20 +3,35 @@ import { getSupabaseAdmin } from '@/lib/db/supabase-admin';
 
 export async function GET() {
   try {
-    const supabase = getSupabaseAdmin();
+    let supabase;
+    try {
+      supabase = getSupabaseAdmin();
+    } catch {
+      // If Supabase isn't configured, return 0 visitors instead of error
+      // This allows the site to work even if database isn't set up yet
+      console.warn('Supabase not configured, returning 0 visitors');
+      return NextResponse.json({ totalVisitors: 0 });
+    }
 
     const { count: totalVisitors, error } = await supabase
       .from('visitors')
       .select('*', { count: 'exact', head: true });
 
     if (error) {
-      return NextResponse.json({ error: 'Failed to fetch visitors' }, { status: 500 });
+      // If table doesn't exist, return 0 instead of error
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        console.warn('Visitors table does not exist yet');
+        return NextResponse.json({ totalVisitors: 0 });
+      }
+      console.error('Visitors count error:', error);
+      return NextResponse.json({ totalVisitors: 0 }); // Return 0 instead of error
     }
 
     return NextResponse.json({ totalVisitors: totalVisitors || 0 });
   } catch (error) {
     console.error('Visitors count API error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    // Always return 0 instead of error to not break the site
+    return NextResponse.json({ totalVisitors: 0 });
   }
 }
 
