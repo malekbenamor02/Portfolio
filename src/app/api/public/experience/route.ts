@@ -18,7 +18,23 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ experience: experience || [] });
+    const mappedExperience = (experience || []).map((e) => {
+      const row = e as Record<string, unknown>;
+      return {
+        id: String(row.id ?? ''),
+        company: String(row.company ?? ''),
+        role: String(row.role ?? ''),
+        duration: String(row.duration ?? ''),
+        location: String(row.location ?? ''),
+        description: String(row.description ?? ''),
+        achievements: Array.isArray(row.achievements) ? (row.achievements as string[]) : [],
+        technologies: Array.isArray(row.technologies) ? (row.technologies as string[]) : [],
+        logo: typeof row.logo === 'string' ? row.logo : undefined,
+        type: typeof row.type === 'string' ? row.type : undefined,
+      };
+    });
+
+    return NextResponse.json({ experience: mappedExperience });
   } catch (error) {
     console.error('Experience API error:', error);
     return NextResponse.json(

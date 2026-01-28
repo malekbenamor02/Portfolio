@@ -1,11 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { experienceData } from "@/data/experience";
+import type { Experience as ExperienceType } from "@/data/experience";
 import { ANIMATION_VARIANTS } from "@/lib/constants";
 import { Calendar, MapPin, Building2 } from "lucide-react";
 
 export function Experience() {
+  const [experienceData, setExperienceData] = useState<ExperienceType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch("/api/public/experience", { cache: "no-store" });
+        const data = (await res.json()) as { experience?: ExperienceType[] };
+        if (!cancelled) setExperienceData(data.experience || []);
+      } catch {
+        if (!cancelled) setExperienceData([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="py-20 px-4">
       <div className="container mx-auto max-w-4xl">
@@ -30,6 +53,10 @@ export function Experience() {
         <div className="relative">
           {/* Timeline Line */}
           <div className="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 h-full w-0.5 bg-border" />
+
+          {loading && (
+            <p className="ml-8 md:ml-0 text-sm text-muted-foreground">Loading experience...</p>
+          )}
 
           {experienceData.map((exp, index) => (
             <motion.div

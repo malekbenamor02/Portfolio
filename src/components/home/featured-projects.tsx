@@ -1,11 +1,12 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/ui/project-card";
 import { Button } from "@/components/ui/button";
-import { projects } from "@/data/projects";
+import type { Project } from "@/data/projects";
 import { 
   ScrollReveal, 
   StaggerContainer, 
@@ -14,11 +15,27 @@ import {
 } from "@/components/animations";
 
 export function FeaturedProjects() {
-  // Get featured projects - using available project IDs
-  const featuredProjects = [
-    projects.find(p => p.id === "movflix"),
-    projects.find(p => p.id === "musemate")
-  ].filter(Boolean) as typeof projects;
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch("/api/public/projects", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = (await res.json()) as { projects?: Project[] };
+        if (!cancelled) setProjects(data.projects || []);
+      } catch {
+        // ignore
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const featuredProjects = useMemo(() => projects.slice(0, 2), [projects]);
 
   return (
     <section className="py-20 bg-background">

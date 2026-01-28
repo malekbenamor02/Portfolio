@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { projects } from "@/data/projects";
+import type { Project } from "@/data/projects";
 import { ANIMATION_VARIANTS } from "@/lib/constants";
 import { ExternalLink, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,28 @@ function ProjectTechStack({ technologies }: { technologies: string[] }) {
 }
 
 export function Projects() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch("/api/public/projects", { cache: "no-store" });
+        const data = (await res.json()) as { projects?: Project[] };
+        if (!cancelled) setProjects(data.projects || []);
+      } catch {
+        if (!cancelled) setProjects([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="py-20 px-4 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
@@ -71,6 +93,9 @@ export function Projects() {
           transition={{ duration: 0.3 }}
           className="flex flex-wrap justify-center gap-6"
         >
+          {loading && (
+            <div className="text-sm text-muted-foreground">Loading projects...</div>
+          )}
           {projects.map((project, index) => (
             <motion.div
               key={project.id}

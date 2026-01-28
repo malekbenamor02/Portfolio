@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Github, Linkedin, Mail, Phone } from "lucide-react";
 import { SITE_CONFIG, NAV_ITEMS } from "@/lib/constants";
+import { VisitorCount } from "@/components/common/visitor-count";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -83,6 +84,7 @@ export function Footer() {
           <p className="mt-2 text-xs text-muted-foreground">
             Built with much coffee
           </p>
+          <VisitorCount />
         </div>
       </div>
     </footer>
