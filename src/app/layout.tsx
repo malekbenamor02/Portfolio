@@ -11,7 +11,6 @@ import { generateMetadata } from "./metadata";
 import { JsonLd } from "@/components/seo/json-ld";
 import { CustomCursor } from "@/components/common/enhanced-cursor";
 import { Analytics } from "@vercel/analytics/next";
-import { GoogleAnalytics } from '@next/third-parties/google';
 
 export const metadata = generateMetadata();
 
@@ -63,9 +62,6 @@ export default function RootLayout({
           </ClientLayout>
           <Analytics />
         </ThemeProvider>
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
       </body>
     </html>
   );
