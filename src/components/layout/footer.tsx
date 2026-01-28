@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Github, Linkedin, Mail, Phone } from "lucide-react";
 import { SITE_CONFIG, NAV_ITEMS } from "@/lib/constants";
 import { VisitorCount } from "@/components/common/visitor-count";
+import { NewsletterSignup } from "@/components/common/newsletter-signup";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -9,7 +10,7 @@ export function Footer() {
   return (
     <footer className="mt-auto border-t bg-background">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3 mb-8">
           {/* About Section */}
           <div className="space-y-3">
             <h3 className="font-display text-lg font-bold gradient-text">
@@ -76,6 +77,12 @@ export function Footer() {
             </div>
           </div>
         </div>
+        
+        {/* Newsletter Signup */}
+        <div className="mb-8">
+          <NewsletterSignup />
+        </div>
+        
         {/* Copyright */}
         <div className="mt-8 border-t pt-8 text-center">
           <p className="text-sm text-muted-foreground">

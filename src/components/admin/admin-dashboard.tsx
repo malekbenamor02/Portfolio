@@ -8,8 +8,9 @@ import { Modal } from "./modal";
 import { ProjectForm } from "./project-form";
 import { ExperienceForm } from "./experience-form";
 import { PostForm } from "./post-form";
+import { AdvancedAnalytics } from "./advanced-analytics";
 
-type Tab = "projects" | "experience" | "posts" | "analytics";
+type Tab = "projects" | "experience" | "posts" | "analytics" | "testimonials";
 
 type Project = {
   id: string;
@@ -52,6 +53,17 @@ type BlogPost = {
   views?: number | null;
 };
 
+type Testimonial = {
+  id: string;
+  name: string;
+  role: string;
+  company?: string | null;
+  content: string;
+  avatar_url?: string | null;
+  rating?: number | null;
+  approved?: boolean | null;
+};
+
 type Analytics = {
   totalVisitors: number;
   uniqueVisitors?: { today?: number; week?: number; month?: number };
@@ -67,6 +79,7 @@ export function AdminDashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [experience, setExperience] = useState<Experience[]>([]);
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
   // Modal states
@@ -76,6 +89,8 @@ export function AdminDashboard() {
   const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
   const [showPostModal, setShowPostModal] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [showTestimonialModal, setShowTestimonialModal] = useState(false);
+  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null);
 
   const activeLabel = useMemo(() => {
     switch (tab) {
@@ -87,6 +102,8 @@ export function AdminDashboard() {
         return "Posts";
       case "analytics":
         return "Analytics";
+      case "testimonials":
+        return "Testimonials";
     }
   }, [tab]);
 
@@ -102,7 +119,9 @@ export function AdminDashboard() {
             ? "/api/admin/experience"
             : t === "posts"
               ? "/api/admin/posts"
-              : "/api/admin/analytics";
+              : t === "testimonials"
+                ? "/api/admin/testimonials"
+                : "/api/admin/analytics";
 
       const res = await fetch(url, { cache: "no-store" });
       const data = await res.json();
@@ -111,6 +130,7 @@ export function AdminDashboard() {
       if (t === "projects") setProjects(data.projects || []);
       if (t === "experience") setExperience(data.experience || []);
       if (t === "posts") setPosts(data.posts || []);
+      if (t === "testimonials") setTestimonials(data.testimonials || []);
       if (t === "analytics") setAnalytics(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
@@ -272,7 +292,7 @@ export function AdminDashboard() {
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 border-b pb-2">
-        {(["projects", "experience", "posts", "analytics"] as Tab[]).map((t) => (
+        {(["projects", "experience", "posts", "testimonials", "analytics"] as Tab[]).map((t) => (
           <Button
             key={t}
             variant={tab === t ? "default" : "ghost"}
@@ -306,66 +326,93 @@ export function AdminDashboard() {
       )}
 
       {/* Analytics Tab */}
-      {!loading && tab === "analytics" && analytics && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total Visitors
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {analytics.totalVisitors?.toLocaleString() || 0}
-              </div>
-            </CardContent>
-          </Card>
+      {!loading && tab === "analytics" && <AdvancedAnalytics />}
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Unique Today
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {analytics.uniqueVisitors?.today?.toLocaleString() || 0}
-              </div>
-            </CardContent>
-          </Card>
+      {/* Testimonials Tab */}
+      {!loading && tab === "testimonials" && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Testimonials ({testimonials.length})</h2>
+            <Button onClick={() => setShowTestimonialModal(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Testimonial
+            </Button>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Unique This Month
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {analytics.uniqueVisitors?.month?.toLocaleString() || 0}
-              </div>
-            </CardContent>
-          </Card>
-
-          {analytics.topPages && analytics.topPages.length > 0 && (
-            <Card className="md:col-span-3">
-              <CardHeader>
-                <CardTitle>Top Pages</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {analytics.topPages.map((page, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between p-2 rounded-md bg-muted/50"
-                    >
-                      <span className="text-sm font-mono">{page.path}</span>
-                      <span className="text-sm font-medium">{page.count} views</span>
-                    </div>
-                  ))}
-                </div>
+          {testimonials.length === 0 ? (
+            <Card>
+              <CardContent className="p-8 text-center text-muted-foreground">
+                No testimonials yet. Add your first testimonial!
               </CardContent>
             </Card>
+          ) : (
+            <div className="space-y-4">
+              {testimonials.map((t) => (
+                <Card key={t.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle>{t.name}</CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {t.role} {t.company && `at ${t.company}`}
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        {t.approved ? (
+                          <span className="text-xs bg-green-500/10 text-green-400 px-2 py-1 rounded">
+                            Approved
+                          </span>
+                        ) : (
+                          <span className="text-xs bg-yellow-500/10 text-yellow-400 px-2 py-1 rounded">
+                            Pending
+                          </span>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditingTestimonial(t);
+                            setShowTestimonialModal(true);
+                          }}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={async () => {
+                            if (!confirm("Delete this testimonial?")) return;
+                            const res = await fetch(`/api/admin/testimonials/${t.id}`, { method: "DELETE" });
+                            if (res.ok) {
+                              setTestimonials((prev) => prev.filter((x) => x.id !== t.id));
+                              setSuccess("Testimonial deleted!");
+                            }
+                          }}
+                          className="text-red-400 hover:text-red-500"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-2">&quot;{t.content}&quot;</p>
+                    {t.rating && (
+                      <div className="flex gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span
+                            key={i}
+                            className={i < (t.rating || 0) ? "text-yellow-400" : "text-muted-foreground"}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
         </div>
       )}

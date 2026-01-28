@@ -8,6 +8,7 @@ import {
   ScrollReveal, 
   GradientText
 } from "@/components/animations";
+import { SkillsVisualization } from "@/components/sections/skills-visualization";
 
 export function About() {
   return (
@@ -99,6 +100,9 @@ export function About() {
             </div>
           </div>
         </motion.div>
+
+        {/* Skills Visualization */}
+        <SkillsVisualization />
       </div>
     </section>
   );
