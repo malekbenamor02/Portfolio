@@ -43,29 +43,48 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin();
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const path = `${FOLDER}/${Date.now()}-${safeName}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const { data, error } = await supabase.storage
+    let result = await supabase.storage
       .from(BUCKET)
       .upload(path, buffer, {
         contentType: file.type,
         upsert: false,
       });
 
-    if (error) {
-      console.error('Testimonial upload error:', error);
+    if (result.error) {
+      const isBucketMissing =
+        result.error.message?.includes('Bucket') ||
+        result.error.message?.includes('not found') ||
+        result.error.message?.toLowerCase().includes('bucket');
+      if (isBucketMissing) {
+        const { error: createErr } = await supabase.storage.createBucket(BUCKET, {
+          public: true,
+          fileSizeLimit: '2MB',
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+        });
+        if (!createErr) {
+          result = await supabase.storage.from(BUCKET).upload(path, buffer, {
+            contentType: file.type,
+            upsert: false,
+          });
+        }
+      }
+    }
+
+    if (result.error || !result.data) {
+      console.error('Testimonial upload error:', result.error);
       return NextResponse.json(
-        { error: 'Upload failed. Check storage bucket "portfolio-files" exists and is public.' },
+        { error: 'Upload failed. Create a public Storage bucket named "portfolio-files" in Supabase Dashboard → Storage.' },
         { status: 500 }
       );
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '') || '';
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${data.path}`;
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${result.data.path}`;
 
     return NextResponse.json({ url: publicUrl });
   } catch (e) {
