@@ -26,6 +26,15 @@ export async function GET() {
       .order('order_index', { ascending: true });
 
     if (error) {
+      // Table may not exist yet (migration not run); return empty list so dashboard still loads
+      const isMissingTable =
+        error.code === '42P01' ||
+        (typeof error.message === 'string' && error.message.includes('does not exist'));
+      if (isMissingTable) {
+        console.warn('Testimonials table missing or inaccessible. Run supabase-schema-updates.sql:', error.message);
+        return NextResponse.json({ testimonials: [] });
+      }
+      console.error('Testimonials fetch error:', error);
       return NextResponse.json(
         { error: 'Failed to fetch testimonials' },
         { status: 500 }
