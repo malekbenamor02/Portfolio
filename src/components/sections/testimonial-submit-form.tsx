@@ -220,7 +220,6 @@ export function TestimonialSubmitForm() {
                 value={formData.name}
                 onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                 className="w-full px-4 py-2 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="John Doe"
               />
             </div>
             <div>
@@ -235,7 +234,6 @@ export function TestimonialSubmitForm() {
                 value={formData.role}
                 onChange={(e) => setFormData((p) => ({ ...p, role: e.target.value }))}
                 className="w-full px-4 py-2 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="Senior Developer"
               />
             </div>
           </div>
@@ -252,7 +250,6 @@ export function TestimonialSubmitForm() {
               value={formData.company}
               onChange={(e) => setFormData((p) => ({ ...p, company: e.target.value }))}
               className="w-full px-4 py-2 rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="Acme Inc."
             />
           </div>
 
