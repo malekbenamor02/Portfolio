@@ -37,6 +37,11 @@ export async function requireAdmin(): Promise<{ user: AdminUser; token: JWTPaylo
       throw new Error('Unauthorized: User not found or inactive');
     }
 
+    const role = (user.role ?? '').toLowerCase();
+    if (role !== 'admin') {
+      throw new Error('Unauthorized: Admin role required');
+    }
+
     return {
       user: {
         id: user.id,

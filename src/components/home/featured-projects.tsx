@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ProjectCard } from "@/components/ui/project-card";
 import { Button } from "@/components/ui/button";
-import type { Project } from "@/data/projects";
+import { type Project, projects as staticProjects } from "@/data/projects";
 import { 
   ScrollReveal, 
   StaggerContainer, 
@@ -15,18 +15,20 @@ import {
 } from "@/components/animations";
 
 export function FeaturedProjects() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>(() => staticProjects);
 
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
       try {
         const res = await fetch("/api/public/projects", { cache: "no-store" });
-        if (!res.ok) return;
         const data = (await res.json()) as { projects?: Project[] };
-        if (!cancelled) setProjects(data.projects || []);
+        if (cancelled) return;
+        if (res.ok && data.projects && data.projects.length > 0) {
+          setProjects(data.projects);
+        }
       } catch {
-        // ignore
+        // keep static projects on error
       }
     };
     void load();

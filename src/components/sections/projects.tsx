@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import type { Project } from "@/data/projects";
+import { type Project, projects as staticProjects } from "@/data/projects";
 import { ANIMATION_VARIANTS } from "@/lib/constants";
 import { ExternalLink, Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ function ProjectTechStack({ technologies }: { technologies: string[] }) {
 }
 
 export function Projects() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>(() => staticProjects);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -53,9 +53,12 @@ export function Projects() {
       try {
         const res = await fetch("/api/public/projects", { cache: "no-store" });
         const data = (await res.json()) as { projects?: Project[] };
-        if (!cancelled) setProjects(data.projects || []);
+        if (cancelled) return;
+        if (res.ok && data.projects && data.projects.length > 0) {
+          setProjects(data.projects);
+        }
       } catch {
-        if (!cancelled) setProjects([]);
+        // keep static projects on error
       } finally {
         if (!cancelled) setLoading(false);
       }

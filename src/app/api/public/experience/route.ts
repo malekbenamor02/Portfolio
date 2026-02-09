@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase-admin';
+import { rateLimit, getClientIP } from '@/lib/security/rate-limit';
+import { safeErrorResponse } from '@/lib/security/api-security';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const ip = getClientIP(request);
+    if (!rateLimit(`public-get:experience:${ip}`, 120, 60 * 1000)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
     let supabase;
     try {
       supabase = getSupabaseAdmin();
@@ -45,10 +51,6 @@ export async function GET() {
 
     return NextResponse.json({ experience: mappedExperience });
   } catch (error) {
-    console.error('Experience API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return safeErrorResponse(error, 500);
   }
 }

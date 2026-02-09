@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase-admin';
 import { rateLimit, getClientIP } from '@/lib/security/rate-limit';
+import { safeErrorResponse } from '@/lib/security/api-security';
 
 const BUCKET = 'portfolio-files';
 const FOLDER = 'testimonials';
@@ -68,10 +69,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: publicUrl });
   } catch (e) {
-    console.error('Testimonial upload API error:', e);
-    return NextResponse.json(
-      { error: 'Something went wrong. Please try again.' },
-      { status: 500 }
-    );
+    return safeErrorResponse(e, 500, 'Something went wrong. Please try again.');
   }
 }

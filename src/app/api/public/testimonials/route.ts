@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase-admin';
 import { rateLimit, getClientIP } from '@/lib/security/rate-limit';
+import { safeErrorResponse } from '@/lib/security/api-security';
 import { z } from 'zod';
 
 const publicTestimonialSchema = z.object({
@@ -12,8 +13,12 @@ const publicTestimonialSchema = z.object({
   rating: z.number().min(1).max(5),
 });
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const ip = getClientIP(request);
+    if (!rateLimit(`public-get:testimonials:${ip}`, 120, 60 * 1000)) {
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+    }
     const supabase = getSupabaseAdmin();
 
     const { data: testimonials, error } = await supabase
@@ -43,7 +48,9 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
-
+    if (!request.headers.get('content-type')?.includes('application/json')) {
+      return NextResponse.json({ error: 'Content-Type must be application/json' }, { status: 415 });
+    }
     const body = await request.json();
     const data = publicTestimonialSchema.parse(body);
 
@@ -83,10 +90,6 @@ export async function POST(request: NextRequest) {
       const msg = first ? `${first.path.join('.')}: ${first.message}` : 'Invalid data';
       return NextResponse.json({ error: msg }, { status: 400 });
     }
-    console.error('Public testimonial API error:', error);
-    return NextResponse.json(
-      { error: 'Something went wrong. Please try again.' },
-      { status: 500 }
-    );
+    return safeErrorResponse(error, 500, 'Something went wrong. Please try again.');
   }
 }

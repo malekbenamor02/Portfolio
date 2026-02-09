@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase-admin';
 import { rateLimit, getClientIP } from '@/lib/security/rate-limit';
+import { safeErrorResponse } from '@/lib/security/api-security';
 import { z } from 'zod';
 
 const subscribeSchema = z.object({
@@ -18,7 +19,9 @@ export async function POST(request: NextRequest) {
         { status: 429 }
       );
     }
-
+    if (!request.headers.get('content-type')?.includes('application/json')) {
+      return NextResponse.json({ error: 'Content-Type must be application/json' }, { status: 415 });
+    }
     const body = await request.json();
     const { email, name } = subscribeSchema.parse(body);
 
@@ -91,11 +94,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
-    console.error('Newsletter API error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return safeErrorResponse(error, 500, 'Failed to subscribe. Please try again later.');
   }
 }

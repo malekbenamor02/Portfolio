@@ -1,8 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/db/supabase-admin';
+import { rateLimit, getClientIP } from '@/lib/security/rate-limit';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const ip = getClientIP(request);
+    if (!rateLimit(`public-get:visitors:${ip}`, 60, 60 * 1000)) {
+      return NextResponse.json({ totalVisitors: 0 });
+    }
     let supabase;
     try {
       supabase = getSupabaseAdmin();
