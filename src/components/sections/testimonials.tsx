@@ -106,12 +106,15 @@ export function Testimonials() {
                   )}
                   <div className="flex items-center gap-3">
                     {testimonial.avatar_url ? (
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
+                      <div
+                        className="relative shrink-0 overflow-hidden rounded-full"
+                        style={{ width: 48, height: 48, minWidth: 48, minHeight: 48 }}
+                      >
                         <Image
                           src={testimonial.avatar_url}
                           alt={testimonial.name}
                           fill
-                          className="object-cover"
+                          className="object-cover object-center"
                           sizes="48px"
                         />
                       </div>
