@@ -61,16 +61,30 @@ export function Testimonials() {
         </motion.div>
 
         {testimonials.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: { staggerChildren: 0.1, delayChildren: 0.05 },
+            },
+          }}
+        >
+          {testimonials.map((testimonial) => (
             <motion.div
               key={testimonial.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              variants={{
+                hidden: { opacity: 0, y: 24, scale: 0.96 },
+                visible: { opacity: 1, y: 0, scale: 1 },
+              }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="h-full"
             >
-              <Card className="h-full hover:shadow-lg transition-shadow">
+              <Card className="h-full transition-shadow duration-300 hover:shadow-xl hover:shadow-primary/5">
                 <CardContent className="p-6">
                   <Quote className="h-8 w-8 text-primary/50 mb-4" />
                   <p className="text-muted-foreground mb-4 italic">
@@ -118,7 +132,7 @@ export function Testimonials() {
               </Card>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
         )}
 
         <TestimonialSubmitForm />

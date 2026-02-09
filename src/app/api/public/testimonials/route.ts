@@ -6,10 +6,10 @@ import { z } from 'zod';
 const publicTestimonialSchema = z.object({
   name: z.string().min(1).max(200),
   role: z.string().min(1).max(200),
-  company: z.string().max(200).optional(),
+  company: z.string().min(1).max(200),
   content: z.string().min(10).max(2000),
-  avatar_url: z.union([z.string().url().max(500), z.literal('')]).optional(),
-  rating: z.number().min(1).max(5).optional(),
+  avatar_url: z.string().url().max(2000),
+  rating: z.number().min(1).max(5),
 });
 
 export async function GET() {
@@ -53,10 +53,10 @@ export async function POST(request: NextRequest) {
       .insert({
         name: data.name.trim(),
         role: data.role.trim(),
-        company: data.company?.trim() || null,
+        company: data.company.trim(),
         content: data.content.trim(),
-        avatar_url: data.avatar_url?.trim() || null,
-        rating: data.rating ?? null,
+        avatar_url: data.avatar_url.trim(),
+        rating: data.rating,
         approved: false,
         featured: false,
         order_index: 0,
