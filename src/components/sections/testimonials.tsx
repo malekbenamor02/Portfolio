@@ -106,13 +106,15 @@ export function Testimonials() {
                   )}
                   <div className="flex items-center gap-3">
                     {testimonial.avatar_url ? (
-                      <Image
-                        src={testimonial.avatar_url}
-                        alt={testimonial.name}
-                        width={48}
-                        height={48}
-                        className="rounded-full"
-                      />
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
+                        <Image
+                          src={testimonial.avatar_url}
+                          alt={testimonial.name}
+                          fill
+                          className="object-cover"
+                          sizes="48px"
+                        />
+                      </div>
                     ) : (
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                         <span className="text-primary font-semibold">
