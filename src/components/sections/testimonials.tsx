@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Quote, Star } from "lucide-react";
 import Image from "next/image";
+import { TestimonialSubmitForm } from "./testimonial-submit-form";
 
 type Testimonial = {
   id: string;
@@ -42,10 +43,6 @@ export function Testimonials() {
     );
   }
 
-  if (testimonials.length === 0) {
-    return null;
-  }
-
   return (
     <section className="py-20 px-4 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
@@ -63,6 +60,7 @@ export function Testimonials() {
           </p>
         </motion.div>
 
+        {testimonials.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial, index) => (
             <motion.div
@@ -121,6 +119,9 @@ export function Testimonials() {
             </motion.div>
           ))}
         </div>
+        )}
+
+        <TestimonialSubmitForm />
       </div>
     </section>
   );

@@ -8,6 +8,7 @@ import { Modal } from "./modal";
 import { ProjectForm } from "./project-form";
 import { ExperienceForm } from "./experience-form";
 import { PostForm } from "./post-form";
+import { TestimonialForm } from "./testimonial-form";
 import { AdvancedAnalytics } from "./advanced-analytics";
 
 type Tab = "projects" | "experience" | "posts" | "analytics" | "testimonials";
@@ -250,6 +251,37 @@ export function AdminDashboard() {
     }
   };
 
+  // Testimonial handlers
+  const handleSaveTestimonial = async (
+    t: Omit<Testimonial, "id"> & { id?: string }
+  ) => {
+    const url = editingTestimonial
+      ? `/api/admin/testimonials/${editingTestimonial.id}`
+      : "/api/admin/testimonials";
+    const method = editingTestimonial ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(t),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data?.error || "Failed to save testimonial");
+    }
+
+    setShowTestimonialModal(false);
+    setEditingTestimonial(null);
+    setSuccess(editingTestimonial ? "Testimonial updated!" : "Testimonial created!");
+    await fetchTab("testimonials");
+  };
+
+  const openTestimonialModal = (testimonial?: Testimonial) => {
+    setEditingTestimonial(testimonial || null);
+    setShowTestimonialModal(true);
+  };
+
   const openProjectModal = (project?: Project) => {
     setEditingProject(project || null);
     setShowProjectModal(true);
@@ -333,7 +365,7 @@ export function AdminDashboard() {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Testimonials ({testimonials.length})</h2>
-            <Button onClick={() => setShowTestimonialModal(true)}>
+            <Button onClick={() => openTestimonialModal()}>
               <Plus className="h-4 w-4 mr-2" />
               New Testimonial
             </Button>
@@ -370,10 +402,7 @@ export function AdminDashboard() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {
-                            setEditingTestimonial(t);
-                            setShowTestimonialModal(true);
-                          }}
+                          onClick={() => openTestimonialModal(t)}
                         >
                           <Edit2 className="h-4 w-4" />
                         </Button>
@@ -740,6 +769,25 @@ export function AdminDashboard() {
           onCancel={() => {
             setShowPostModal(false);
             setEditingPost(null);
+          }}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={showTestimonialModal}
+        onClose={() => {
+          setShowTestimonialModal(false);
+          setEditingTestimonial(null);
+        }}
+        title={editingTestimonial ? "Edit Testimonial" : "New Testimonial"}
+        size="lg"
+      >
+        <TestimonialForm
+          testimonial={editingTestimonial}
+          onSave={handleSaveTestimonial}
+          onCancel={() => {
+            setShowTestimonialModal(false);
+            setEditingTestimonial(null);
           }}
         />
       </Modal>
